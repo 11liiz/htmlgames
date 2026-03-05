@@ -13,35 +13,12 @@
   --dim:#3a4a5a;--text:#8fa8c0;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;background:var(--bg);font-family:'Share Tech Mono',monospace;overflow:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.05) 3px,rgba(0,0,0,0.05) 4px);}
 
-html,body{
-width:100%;height:100%;
-background:var(–bg);
-font-family:‘Share Tech Mono’,monospace;
-overflow:hidden;
-}
+.shell{width:100%;height:100%;display:flex;flex-direction:column;background:var(–panel);}
 
-/* Scanlines */
-body::after{
-content:’’;position:fixed;inset:0;pointer-events:none;z-index:998;
-background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.05) 3px,rgba(0,0,0,0.05) 4px);
-}
-
-/* ── Full-height flex shell ── */
-.shell{
-width:100%;height:100%;
-display:flex;flex-direction:column;
-background:var(–panel);
-}
-
-/* ── Header ── */
-.hdr{
-display:flex;align-items:center;justify-content:space-between;
-padding:8px 14px;
-border-bottom:1px solid var(–border);
-background:linear-gradient(90deg,#0a141e,#0c1a26);
-flex-shrink:0;
-}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(–border);background:linear-gradient(90deg,#0a141e,#0c1a26);flex-shrink:0;}
 .hdr-title{font-family:‘Orbitron’,sans-serif;font-size:13px;font-weight:900;color:var(–yellow);letter-spacing:3px;text-shadow:0 0 18px rgba(240,192,64,0.45);}
 .hdr-sub{font-size:8px;color:var(–dim);letter-spacing:2px;margin-top:1px;}
 .hdr-right{display:flex;align-items:center;gap:6px;font-size:10px;color:var(–text);}
@@ -49,43 +26,15 @@ flex-shrink:0;
 .dot.live{background:var(–green);animation:blink 1s infinite;}
 @keyframes blink{50%{opacity:.35;}}
 
-/* ── Middle: canvas + desktop sidebar ── */
-.middle{
-display:flex;
-flex:1;
-overflow:hidden;
-min-height:0; /* critical for flex shrink */
-}
+.middle{display:flex;flex:1;overflow:hidden;min-height:0;}
 
-/* Canvas fills remaining height */
-.canvas-wrap{
-position:relative;
-flex:1;
-min-width:0;
-background:#071509;
-display:flex;align-items:center;justify-content:center;
-overflow:hidden;
-}
-canvas{
-display:block;
-image-rendering:pixelated;
-/* sized by JS to fit the wrap without letterboxing */
-}
-.canvas-wrap::after{
-content:’’;position:absolute;inset:0;pointer-events:none;
-background:radial-gradient(ellipse at center,transparent 50%,rgba(8,12,16,0.6) 100%);
-z-index:1;
-}
+.canvas-wrap{position:relative;flex:1;min-width:0;background:#071509;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+canvas{display:block;image-rendering:pixelated;}
+.canvas-wrap::after{content:’’;position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(8,12,16,0.6) 100%);z-index:1;}
 
-/* ── Desktop sidebar (hidden on mobile) ── */
-.sidebar{
-width:200px;flex-shrink:0;
-display:flex;flex-direction:column;
-border-left:1px solid var(–border);
-overflow:hidden;
-}
+.sidebar{width:200px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid var(–border);overflow:hidden;}
 .pblock{padding:9px 12px;border-bottom:1px solid var(–border);flex-shrink:0;}
-.pblock.grow{flex:1;display:flex;flex-direction:column;border-bottom:none;}
+.pblock.grow{flex:1;display:flex;flex-direction:column;border-bottom:none;overflow:hidden;}
 .plabel{font-size:7px;color:var(–dim);letter-spacing:2px;margin-bottom:7px;text-transform:uppercase;}
 .stand-row{display:grid;grid-template-columns:14px 8px 1fr auto;align-items:center;gap:5px;margin-bottom:5px;font-size:9px;}
 .stand-pos{color:var(–dim);font-size:8px;text-align:right;}
@@ -104,68 +53,56 @@ overflow:hidden;
 .log-line{font-size:8px;color:var(–dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .log-line.hi{color:var(–green);}
 
-/* ── Mobile bottom panel ── */
-.mob-panel{
-display:none;
-flex-direction:column;
-flex-shrink:0;
-border-top:1px solid var(–border);
-background:#090e14;
-}
-/* Stats row */
-.mob-stats{
-display:grid;grid-template-columns:repeat(3,1fr);
-border-bottom:1px solid var(–border);
-}
+/* Win History Panel */
+.win-history{display:flex;flex-direction:column;gap:4px;}
+.win-row{display:flex;align-items:center;gap:6px;}
+.win-name{font-size:8px;color:var(–text);width:52px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.win-bar-wrap{flex:1;height:6px;background:var(–bg);border:1px solid var(–border);overflow:hidden;position:relative;}
+.win-bar-fill{height:100%;transition:width .4s ease;opacity:0.85;}
+.win-count{font-size:8px;color:var(–yellow);font-family:‘Orbitron’,sans-serif;font-weight:700;width:14px;text-align:right;flex-shrink:0;}
+.win-trophy{font-size:8px;width:12px;text-align:center;flex-shrink:0;}
+
+/* Podium flash animation */
+@keyframes podiumFlash{0%{opacity:0;transform:scale(.92);}60%{opacity:1;transform:scale(1.04);}100%{opacity:1;transform:scale(1);}}
+.win-row.new-win .win-bar-fill{animation:podiumFlash .5s ease forwards;}
+
+.mob-panel{display:none;flex-direction:column;flex-shrink:0;border-top:1px solid var(–border);background:#090e14;}
+.mob-stats{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(–border);}
 .mob-stat{padding:7px 0;text-align:center;border-right:1px solid var(–border);}
 .mob-stat:last-child{border-right:none;}
 .mob-stat .val{font-family:‘Orbitron’,sans-serif;font-size:14px;font-weight:700;color:var(–cyan);line-height:1;margin-bottom:2px;}
 .mob-stat .lbl{font-size:7px;color:var(–dim);letter-spacing:1px;}
-/* Standings strip */
-.mob-stand{
-display:grid;
-grid-template-columns:repeat(5,1fr);
-border-bottom:1px solid var(–border);
-}
-.mob-car{
-display:flex;flex-direction:column;align-items:center;justify-content:center;
-padding:5px 4px;gap:3px;
-border-right:1px solid var(–border);
-overflow:hidden;
-}
+.mob-stand{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(–border);}
+.mob-car{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px 4px;gap:3px;border-right:1px solid var(–border);overflow:hidden;}
 .mob-car:last-child{border-right:none;}
 .mob-pos{font-size:9px;color:var(–yellow);font-family:‘Orbitron’,sans-serif;font-weight:700;}
 .mob-name{font-size:7px;color:#c8dce8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;text-align:center;}
 .mob-lap{font-size:7px;color:var(–dim);}
 
-/* ── Footer / controls ── */
-.footer{
-display:flex;align-items:center;gap:8px;
-padding:7px 14px;
-border-top:1px solid var(–border);
-background:#090e14;
-flex-shrink:0;
-}
-.btn{
-font-family:‘Orbitron’,sans-serif;font-size:8px;font-weight:700;
-letter-spacing:2px;border:1px solid var(–border);
-background:var(–bg);color:var(–text);
-padding:7px 16px;cursor:pointer;transition:all .15s;text-transform:uppercase;
--webkit-tap-highlight-color:transparent;touch-action:manipulation;
-}
+/* Mobile win history strip */
+.mob-wins{display:flex;align-items:center;gap:0;border-bottom:1px solid var(–border);}
+.mob-win-cell{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 2px;border-right:1px solid var(–border);gap:2px;}
+.mob-win-cell:last-child{border-right:none;}
+.mob-win-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.mob-win-name{font-size:6px;color:var(–text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;text-align:center;}
+.mob-win-num{font-family:‘Orbitron’,sans-serif;font-size:11px;font-weight:700;color:var(–yellow);line-height:1;}
+
+.footer{display:flex;align-items:center;gap:8px;padding:7px 14px;border-top:1px solid var(–border);background:#090e14;flex-shrink:0;}
+.btn{font-family:‘Orbitron’,sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;border:1px solid var(–border);background:var(–bg);color:var(–text);padding:7px 16px;cursor:pointer;transition:all .15s;text-transform:uppercase;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .btn:hover,.btn:active{border-color:var(–cyan);color:var(–cyan);}
 .btn.primary{border-color:var(–yellow);color:var(–yellow);}
 .btn.primary:active,.btn.primary:hover{background:var(–yellow);color:#000;}
+.btn.danger{border-color:#ff3355;color:#ff3355;}
+.btn.danger:hover,.btn.danger:active{background:#ff3355;color:#000;}
 .footer-r{margin-left:auto;font-size:8px;color:var(–dim);letter-spacing:1px;}
 
-/* Winner overlay */
 .overlay{display:none;position:absolute;inset:0;z-index:10;background:rgba(8,12,16,0.9);align-items:center;justify-content:center;flex-direction:column;gap:10px;}
 .overlay.show{display:flex;}
 .ov-title{font-family:‘Orbitron’,sans-serif;font-weight:900;font-size:16px;color:var(–yellow);letter-spacing:3px;text-align:center;animation:opulse .8s infinite alternate;}
 @keyframes opulse{to{text-shadow:0 0 50px rgba(240,192,64,0.9);}}
 .ov-sub{font-size:10px;color:var(–text);letter-spacing:2px;}
+.ov-wins{font-size:9px;color:var(–cyan);letter-spacing:1px;margin-top:4px;}
 
-/* ── Responsive ── */
 @media(max-width:600px){
 .sidebar{display:none;}
 .mob-panel{display:flex;}
@@ -180,8 +117,6 @@ padding:7px 16px;cursor:pointer;transition:all .15s;text-transform:uppercase;
 <body>
 <div class="shell">
 
-  <!-- Header -->
-
   <div class="hdr">
     <div>
       <div class="hdr-title">PIXEL GP</div>
@@ -193,21 +128,17 @@ padding:7px 16px;cursor:pointer;transition:all .15s;text-transform:uppercase;
     </div>
   </div>
 
-  <!-- Middle -->
-
   <div class="middle">
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="c"></canvas>
+      <div class="overlay" id="overlay">
+        <div class="ov-title" id="ovTitle">WINNER</div>
+        <div class="ov-sub" id="ovSub"></div>
+        <div class="ov-wins" id="ovWins"></div>
+      </div>
+    </div>
 
 ```
-<!-- Track canvas -->
-<div class="canvas-wrap" id="canvasWrap">
-  <canvas id="c"></canvas>
-  <div class="overlay" id="overlay">
-    <div class="ov-title" id="ovTitle">WINNER</div>
-    <div class="ov-sub"  id="ovSub"></div>
-  </div>
-</div>
-
-<!-- Desktop sidebar -->
 <div class="sidebar">
   <div class="pblock">
     <div class="plabel">Standings</div>
@@ -225,6 +156,10 @@ padding:7px 16px;cursor:pointer;transition:all .15s;text-transform:uppercase;
     <div class="plabel">Throttle</div>
     <div id="speedBars"></div>
   </div>
+  <div class="pblock">
+    <div class="plabel">Win History</div>
+    <div class="win-history" id="winHistory"></div>
+  </div>
   <div class="pblock grow">
     <div class="plabel">Event Log</div>
     <div class="log-area" id="log"></div>
@@ -234,8 +169,6 @@ padding:7px 16px;cursor:pointer;transition:all .15s;text-transform:uppercase;
 
   </div>
 
-  <!-- Mobile bottom panel -->
-
   <div class="mob-panel">
     <div class="mob-stats">
       <div class="mob-stat"><div class="val" id="mLap">—</div><div class="lbl">LAP</div></div>
@@ -243,14 +176,14 @@ padding:7px 16px;cursor:pointer;transition:all .15s;text-transform:uppercase;
       <div class="mob-stat"><div class="val" id="mGap">—</div><div class="lbl">GAP</div></div>
     </div>
     <div class="mob-stand" id="mobStand"></div>
+    <div class="mob-wins" id="mobWins"></div>
   </div>
-
-  <!-- Footer -->
 
   <div class="footer">
     <button class="btn primary" id="startBtn" onclick="startRace()">▶ START</button>
     <button class="btn" onclick="resetRace()">↺ RESET</button>
-    <div class="footer-r">5 LAPS · 5 CARS</div>
+    <button class="btn danger" onclick="clearWins()" title="Clear win history">✕ WINS</button>
+    <div class="footer-r" id="raceCounter">RACE 0 · 5 LAPS</div>
   </div>
 
 </div>
@@ -259,13 +192,11 @@ padding:7px 16px;cursor:pointer;transition:all .15s;text-transform:uppercase;
 // ── Canvas ────────────────────────────────────────────────────────────────
 const cv  = document.getElementById('c');
 const ctx = cv.getContext('2d');
-// Internal resolution
 const CW = 470, CH = 340;
 cv.width = CW; cv.height = CH;
 
 const LAPS = 5;
 
-// Fit canvas inside its wrap without black bars
 function sizeCanvas(){
   const wrap = document.getElementById('canvasWrap');
   const ww = wrap.clientWidth, wh = wrap.clientHeight;
@@ -313,6 +244,58 @@ const DEFS=[
   {name:'BLAZER',  color:'#ff8833',accent:'#1a0800',baseSpd:.99, ag:.7},
 ];
 
+// ── Win History ───────────────────────────────────────────────────────────
+// Persisted in memory; cleared by the ✕ WINS button
+let winHistory = {}; // { name: count }
+let raceCount = 0;
+DEFS.forEach(d => winHistory[d.name] = 0);
+
+function recordWin(name){
+  winHistory[name] = (winHistory[name] || 0) + 1;
+  raceCount++;
+}
+
+function clearWins(){
+  DEFS.forEach(d => winHistory[d.name] = 0);
+  raceCount = 0;
+  renderWinHistory(null);
+  document.getElementById('raceCounter').textContent = `RACE 0 · 5 LAPS`;
+}
+
+function renderWinHistory(latestWinner){
+  const maxW = Math.max(1, ...Object.values(winHistory));
+  const sorted = [...DEFS].sort((a,b) => (winHistory[b.name]||0) - (winHistory[a.name]||0));
+
+  // Desktop
+  const el = document.getElementById('winHistory');
+  el.innerHTML = sorted.map((d,i) => {
+    const w = winHistory[d.name] || 0;
+    const pct = (w / maxW) * 100;
+    const isNew = d.name === latestWinner;
+    const trophy = i === 0 && w > 0 ? '🏆' : '';
+    return `<div class="win-row${isNew?' new-win':''}">
+      <span class="win-trophy">${trophy}</span>
+      <span class="win-name" style="color:${d.color}">${d.name.slice(0,7)}</span>
+      <div class="win-bar-wrap">
+        <div class="win-bar-fill" style="width:${pct}%;background:${d.color}"></div>
+      </div>
+      <span class="win-count">${w}</span>
+    </div>`;
+  }).join('');
+
+  // Mobile
+  const mob = document.getElementById('mobWins');
+  mob.innerHTML = DEFS.map(d => {
+    const w = winHistory[d.name] || 0;
+    return `<div class="mob-win-cell">
+      <div class="mob-win-dot" style="background:${d.color}"></div>
+      <span class="mob-win-name">${d.name.slice(0,5)}</span>
+      <span class="mob-win-num">${w}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Race State ────────────────────────────────────────────────────────────
 let cars=[],racing=false,done=false,raceTime=0,ticker=null,raf=null,tick=0;
 
 function makeCar(d,i){
@@ -327,6 +310,7 @@ function resetRace(){
   const b=document.getElementById('startBtn');b.textContent='▶ START';b.disabled=false;
   setStatus('dot','STANDBY');
   document.getElementById('log').innerHTML='';
+  document.getElementById('raceCounter').textContent=`RACE ${raceCount} · 5 LAPS`;
   drawAll();updateUI();
 }
 
@@ -371,9 +355,14 @@ function physicsTick(){
 function endRace(w){
   done=true;clearInterval(ticker);
   setStatus('dot','FINISHED');
+  recordWin(w.name);
+  renderWinHistory(w.name);
+  document.getElementById('raceCounter').textContent=`RACE ${raceCount} · 5 LAPS`;
   const m=Math.floor(w.finTime/60),s=(w.finTime%60).toFixed(2).padStart(5,'0');
+  const totalWins = winHistory[w.name];
   document.getElementById('ovTitle').textContent=`${w.name} WINS!`;
   document.getElementById('ovSub').textContent=`TIME: ${m}:${s}  ·  ${LAPS} LAPS`;
+  document.getElementById('ovWins').textContent=`CAREER WINS: ${totalWins}  ·  RACE #${raceCount}`;
   document.getElementById('overlay').classList.add('show');
 }
 
@@ -446,7 +435,6 @@ function updateUI(){
   let gapTxt='—';
   if(r.length>=2){const g=((leader.lap*PL+leader.pi)-(r[1].lap*PL+r[1].pi))/PL;gapTxt=`${(g*3.8).toFixed(1)}s`;}
 
-  // Desktop
   document.getElementById('standings').innerHTML=r.map((c,i)=>{
     const gap=((leader.lap*PL+leader.pi)-(c.lap*PL+c.pi))/PL;
     return `<div class="stand-row">
@@ -471,12 +459,10 @@ function updateUI(){
     </div>`;
   }).join('');
 
-  // Mobile stats
   ['mLap','mTime','mGap'].forEach((id,j)=>{
     document.getElementById(id).textContent=[lapTxt,`${m}:${s}`,gapTxt][j];
   });
 
-  // Mobile standings grid
   document.getElementById('mobStand').innerHTML=r.map((c,i)=>`
     <div class="mob-car">
       <div style="display:flex;align-items:center;gap:3px">
@@ -500,6 +486,8 @@ function addLog(msg,hi=false){
   while(el.children.length>12)el.removeChild(el.lastChild);
 }
 
+// Init
+renderWinHistory(null);
 resetRace();
 </script>
 
