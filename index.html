@@ -3,139 +3,147 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>PIXEL GP</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap');
-:root {
-  --bg:#080c10; --panel:#0c1219; --border:#1e2d3d;
-  --yellow:#f0c040; --cyan:#00d4ff; --green:#22ff7a;
-  --dim:#3a4a5a; --text:#8fa8c0;
+:root{
+  --bg:#080c10;--panel:#0c1219;--border:#1e2d3d;
+  --yellow:#f0c040;--cyan:#00d4ff;--green:#22ff7a;
+  --dim:#3a4a5a;--text:#8fa8c0;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
 html,body{
-  width:100%;min-height:100vh;
-  background:var(--bg);
-  display:flex;align-items:flex-start;justify-content:center;
-  font-family:'Share Tech Mono',monospace;
-  overflow-x:hidden;
-}
-body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
-  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.05) 3px,rgba(0,0,0,0.05) 4px);
+width:100%;height:100%;
+background:var(–bg);
+font-family:‘Share Tech Mono’,monospace;
+overflow:hidden;
 }
 
-/* ── Shell ── */
+/* Scanlines */
+body::after{
+content:’’;position:fixed;inset:0;pointer-events:none;z-index:998;
+background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.05) 3px,rgba(0,0,0,0.05) 4px);
+}
+
+/* ── Full-height flex shell ── */
 .shell{
-width:100%;max-width:820px;
-background:var(–panel);
-border:1px solid var(–border);
+width:100%;height:100%;
 display:flex;flex-direction:column;
-min-height:100vh;
+background:var(–panel);
 }
 
 /* ── Header ── */
 .hdr{
 display:flex;align-items:center;justify-content:space-between;
-padding:10px 14px;
+padding:8px 14px;
 border-bottom:1px solid var(–border);
 background:linear-gradient(90deg,#0a141e,#0c1a26);
 flex-shrink:0;
 }
-.hdr-title{font-family:‘Orbitron’,sans-serif;font-size:14px;font-weight:900;color:var(–yellow);letter-spacing:3px;text-shadow:0 0 18px rgba(240,192,64,0.45);}
-.hdr-sub{font-size:9px;color:var(–dim);letter-spacing:2px;margin-top:2px;}
-.hdr-right{display:flex;align-items:center;gap:6px;font-size:10px;color:var(–text);flex-shrink:0;}
+.hdr-title{font-family:‘Orbitron’,sans-serif;font-size:13px;font-weight:900;color:var(–yellow);letter-spacing:3px;text-shadow:0 0 18px rgba(240,192,64,0.45);}
+.hdr-sub{font-size:8px;color:var(–dim);letter-spacing:2px;margin-top:1px;}
+.hdr-right{display:flex;align-items:center;gap:6px;font-size:10px;color:var(–text);}
 .dot{width:7px;height:7px;border-radius:50%;background:var(–dim);}
 .dot.live{background:var(–green);animation:blink 1s infinite;}
 @keyframes blink{50%{opacity:.35;}}
 
-/* ── Main body: side-by-side on wide, stacked on narrow ── */
-.body{
+/* ── Middle: canvas + desktop sidebar ── */
+.middle{
 display:flex;
 flex:1;
+overflow:hidden;
+min-height:0; /* critical for flex shrink */
 }
 
-/* Canvas fills available width */
+/* Canvas fills remaining height */
 .canvas-wrap{
 position:relative;
-flex-shrink:0;
-/* width set by JS */
-}
-canvas{display:block;image-rendering:pixelated;width:100%;height:auto;}
-.canvas-wrap::after{
-content:’’;position:absolute;inset:0;pointer-events:none;
-background:radial-gradient(ellipse at center,transparent 50%,rgba(8,12,16,0.65) 100%);
-}
-
-/* ── Sidebar ── */
-.sidebar{
-display:flex;flex-direction:column;
-border-left:1px solid var(–border);
-flex-shrink:0;
-width:200px;
+flex:1;
+min-width:0;
+background:#071509;
+display:flex;align-items:center;justify-content:center;
 overflow:hidden;
 }
+canvas{
+display:block;
+image-rendering:pixelated;
+/* sized by JS to fit the wrap without letterboxing */
+}
+.canvas-wrap::after{
+content:’’;position:absolute;inset:0;pointer-events:none;
+background:radial-gradient(ellipse at center,transparent 50%,rgba(8,12,16,0.6) 100%);
+z-index:1;
+}
 
-.pblock{padding:9px 12px;border-bottom:1px solid var(–border);}
-.pblock:last-child{border-bottom:none;flex:1;display:flex;flex-direction:column;}
+/* ── Desktop sidebar (hidden on mobile) ── */
+.sidebar{
+width:200px;flex-shrink:0;
+display:flex;flex-direction:column;
+border-left:1px solid var(–border);
+overflow:hidden;
+}
+.pblock{padding:9px 12px;border-bottom:1px solid var(–border);flex-shrink:0;}
+.pblock.grow{flex:1;display:flex;flex-direction:column;border-bottom:none;}
 .plabel{font-size:7px;color:var(–dim);letter-spacing:2px;margin-bottom:7px;text-transform:uppercase;}
-
-/* Standings */
 .stand-row{display:grid;grid-template-columns:14px 8px 1fr auto;align-items:center;gap:5px;margin-bottom:5px;font-size:9px;}
 .stand-pos{color:var(–dim);font-size:8px;text-align:right;}
 .stand-name{color:#c8dce8;letter-spacing:.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .stand-gap{color:var(–yellow);font-size:8px;text-align:right;min-width:30px;}
-
-/* Race data */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
 .stat-cell{background:var(–bg);border:1px solid var(–border);padding:5px 6px;}
 .stat-cell .val{font-family:‘Orbitron’,sans-serif;font-size:11px;font-weight:700;color:var(–cyan);line-height:1;margin-bottom:2px;}
 .stat-cell .lbl{font-size:6px;color:var(–dim);letter-spacing:1px;}
-
-/* Speed bars */
 .sbar-row{display:flex;align-items:center;gap:5px;margin-bottom:4px;}
 .sbar-nm{font-size:8px;color:var(–text);width:48px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .sbar-track{flex:1;height:3px;background:var(–bg);border:1px solid var(–border);overflow:hidden;}
 .sbar-fill{height:100%;transition:width .1s ease;}
 .sbar-val{font-size:8px;color:var(–dim);width:24px;text-align:right;flex-shrink:0;}
-
-/* Log */
 .log-area{flex:1;overflow:hidden;display:flex;flex-direction:column-reverse;gap:1px;}
 .log-line{font-size:8px;color:var(–dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .log-line.hi{color:var(–green);}
 
-/* ── Bottom bar: stats + controls on mobile ── */
-.bottom-bar{
-display:none; /* shown on mobile */
+/* ── Mobile bottom panel ── */
+.mob-panel{
+display:none;
 flex-direction:column;
+flex-shrink:0;
 border-top:1px solid var(–border);
 background:#090e14;
 }
-.mobile-stats{
+/* Stats row */
+.mob-stats{
 display:grid;grid-template-columns:repeat(3,1fr);
 border-bottom:1px solid var(–border);
 }
-.mob-stat{padding:8px 10px;border-right:1px solid var(–border);}
+.mob-stat{padding:7px 0;text-align:center;border-right:1px solid var(–border);}
 .mob-stat:last-child{border-right:none;}
-.mob-stat .val{font-family:‘Orbitron’,sans-serif;font-size:13px;font-weight:700;color:var(–cyan);line-height:1;margin-bottom:2px;}
+.mob-stat .val{font-family:‘Orbitron’,sans-serif;font-size:14px;font-weight:700;color:var(–cyan);line-height:1;margin-bottom:2px;}
 .mob-stat .lbl{font-size:7px;color:var(–dim);letter-spacing:1px;}
-
-/* Mobile standings strip */
-.mob-standings{
-display:flex;gap:10px;padding:8px 12px;
-overflow-x:auto;scrollbar-width:none;
+/* Standings strip */
+.mob-stand{
+display:grid;
+grid-template-columns:repeat(5,1fr);
 border-bottom:1px solid var(–border);
 }
-.mob-standings::-webkit-scrollbar{display:none;}
-.mob-car{display:flex;align-items:center;gap:5px;flex-shrink:0;}
-.mob-car-dot{width:8px;height:8px;flex-shrink:0;}
-.mob-car-name{font-size:8px;color:#c8dce8;}
-.mob-car-pos{font-size:8px;color:var(–yellow);}
+.mob-car{
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+padding:5px 4px;gap:3px;
+border-right:1px solid var(–border);
+overflow:hidden;
+}
+.mob-car:last-child{border-right:none;}
+.mob-pos{font-size:9px;color:var(–yellow);font-family:‘Orbitron’,sans-serif;font-weight:700;}
+.mob-name{font-size:7px;color:#c8dce8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;text-align:center;}
+.mob-lap{font-size:7px;color:var(–dim);}
 
-/* Controls */
+/* ── Footer / controls ── */
 .footer{
 display:flex;align-items:center;gap:8px;
-padding:8px 14px;
+padding:7px 14px;
+border-top:1px solid var(–border);
+background:#090e14;
 flex-shrink:0;
 }
 .btn{
@@ -143,31 +151,28 @@ font-family:‘Orbitron’,sans-serif;font-size:8px;font-weight:700;
 letter-spacing:2px;border:1px solid var(–border);
 background:var(–bg);color:var(–text);
 padding:7px 16px;cursor:pointer;transition:all .15s;text-transform:uppercase;
--webkit-tap-highlight-color:transparent;
+-webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
 .btn:hover,.btn:active{border-color:var(–cyan);color:var(–cyan);}
 .btn.primary{border-color:var(–yellow);color:var(–yellow);}
-.btn.primary:hover,.btn.primary:active{background:var(–yellow);color:#000;}
+.btn.primary:active,.btn.primary:hover{background:var(–yellow);color:#000;}
 .footer-r{margin-left:auto;font-size:8px;color:var(–dim);letter-spacing:1px;}
 
 /* Winner overlay */
-.overlay{display:none;position:absolute;inset:0;z-index:50;background:rgba(8,12,16,0.9);align-items:center;justify-content:center;flex-direction:column;gap:10px;}
+.overlay{display:none;position:absolute;inset:0;z-index:10;background:rgba(8,12,16,0.9);align-items:center;justify-content:center;flex-direction:column;gap:10px;}
 .overlay.show{display:flex;}
-.ov-title{font-family:‘Orbitron’,sans-serif;font-weight:900;font-size:16px;color:var(–yellow);text-shadow:0 0 30px rgba(240,192,64,0.6);letter-spacing:3px;text-align:center;animation:opulse .8s infinite alternate;}
+.ov-title{font-family:‘Orbitron’,sans-serif;font-weight:900;font-size:16px;color:var(–yellow);letter-spacing:3px;text-align:center;animation:opulse .8s infinite alternate;}
 @keyframes opulse{to{text-shadow:0 0 50px rgba(240,192,64,0.9);}}
 .ov-sub{font-size:10px;color:var(–text);letter-spacing:2px;}
 
-/* ── Responsive breakpoint ── */
-@media (max-width: 620px) {
-.sidebar { display: none; }
-.bottom-bar { display: flex; }
-.body { flex-direction: column; }
-.canvas-wrap { width: 100% !important; }
-canvas { width: 100% !important; height: auto !important; }
+/* ── Responsive ── */
+@media(max-width:600px){
+.sidebar{display:none;}
+.mob-panel{display:flex;}
 }
-@media (min-width: 621px) {
-.bottom-bar { display: none; }
-.sidebar { display: flex; }
+@media(min-width:601px){
+.sidebar{display:flex;}
+.mob-panel{display:none;}
 }
 </style>
 
@@ -188,12 +193,12 @@ canvas { width: 100% !important; height: auto !important; }
     </div>
   </div>
 
-  <!-- Body -->
+  <!-- Middle -->
 
-  <div class="body">
+  <div class="middle">
 
 ```
-<!-- Track -->
+<!-- Track canvas -->
 <div class="canvas-wrap" id="canvasWrap">
   <canvas id="c"></canvas>
   <div class="overlay" id="overlay">
@@ -220,66 +225,64 @@ canvas { width: 100% !important; height: auto !important; }
     <div class="plabel">Throttle</div>
     <div id="speedBars"></div>
   </div>
-  <div class="pblock">
+  <div class="pblock grow">
     <div class="plabel">Event Log</div>
     <div class="log-area" id="log"></div>
   </div>
 </div>
 ```
 
-  </div><!-- /body -->
+  </div>
 
   <!-- Mobile bottom panel -->
 
-  <div class="bottom-bar">
-    <div class="mobile-stats">
+  <div class="mob-panel">
+    <div class="mob-stats">
       <div class="mob-stat"><div class="val" id="mLap">—</div><div class="lbl">LAP</div></div>
       <div class="mob-stat"><div class="val" id="mTime">0:00</div><div class="lbl">TIME</div></div>
       <div class="mob-stat"><div class="val" id="mGap">—</div><div class="lbl">GAP</div></div>
     </div>
-    <div class="mob-standings" id="mobStandings"></div>
+    <div class="mob-stand" id="mobStand"></div>
   </div>
 
-  <!-- Footer / controls -->
+  <!-- Footer -->
 
   <div class="footer">
     <button class="btn primary" id="startBtn" onclick="startRace()">▶ START</button>
     <button class="btn" onclick="resetRace()">↺ RESET</button>
-    <div class="footer-r" id="lapInfo">5 LAPS · 5 CARS</div>
+    <div class="footer-r">5 LAPS · 5 CARS</div>
   </div>
 
-</div><!-- /shell -->
+</div>
 
 <script>
-// ── Canvas sizing ─────────────────────────────────────────────────────────
+// ── Canvas ────────────────────────────────────────────────────────────────
 const cv  = document.getElementById('c');
 const ctx = cv.getContext('2d');
 // Internal resolution
 const CW = 470, CH = 340;
-cv.width  = CW;
-cv.height = CH;
+cv.width = CW; cv.height = CH;
 
 const LAPS = 5;
-const SIDEBAR_W = 200;
 
-// Size canvas wrap based on available width
+// Fit canvas inside its wrap without black bars
 function sizeCanvas(){
   const wrap = document.getElementById('canvasWrap');
-  const isMobile = window.innerWidth <= 620;
-  const avail = isMobile ? window.innerWidth : Math.min(820, window.innerWidth) - SIDEBAR_W - 2;
-  wrap.style.width  = avail + 'px';
-  wrap.style.height = (avail * CH / CW) + 'px';
+  const ww = wrap.clientWidth, wh = wrap.clientHeight;
+  const scale = Math.min(ww/CW, wh/CH);
+  cv.style.width  = Math.floor(CW*scale)+'px';
+  cv.style.height = Math.floor(CH*scale)+'px';
 }
 sizeCanvas();
 window.addEventListener('resize', sizeCanvas);
 
-// ── Catmull-Rom track ─────────────────────────────────────────────────────
-const WP = [
+// ── Track ─────────────────────────────────────────────────────────────────
+const WP=[
   {x:72,y:55},{x:175,y:36},{x:305,y:42},{x:408,y:65},
   {x:438,y:148},{x:414,y:246},{x:328,y:296},{x:238,y:316},
   {x:152,y:310},{x:66,y:270},{x:36,y:182},{x:46,y:102},
 ];
-const TW = 36, NW = WP.length, STEPS = 24;
+const TW=36, NW=WP.length, STEPS=24;
 
 function crPt(p0,p1,p2,p3,t){
   const t2=t*t,t3=t2*t;
@@ -288,13 +291,11 @@ function crPt(p0,p1,p2,p3,t){
     y:.5*((2*p1.y)+(-p0.y+p2.y)*t+(2*p0.y-5*p1.y+4*p2.y-p3.y)*t2+(-p0.y+3*p1.y-3*p2.y+p3.y)*t3)
   };
 }
-
 const PATH=[];
 for(let i=0;i<NW;i++) for(let s=0;s<STEPS;s++)
   PATH.push(crPt(WP[(i-1+NW)%NW],WP[i],WP[(i+1)%NW],WP[(i+2)%NW],s/STEPS));
 const PL=PATH.length;
 
-// Curvature per point
 const CURV=new Float32Array(PL);
 for(let i=0;i<PL;i++){
   const a=PATH[(i-6+PL)%PL],b=PATH[i],c2=PATH[(i+6)%PL];
@@ -314,31 +315,29 @@ const DEFS=[
 
 let cars=[],racing=false,done=false,raceTime=0,ticker=null,raf=null,tick=0;
 
-function makeCar(d,idx){
-  return{...d,pi:Math.floor((idx/DEFS.length)*PL*.18),lap:0,speed:d.baseSpd*.9,finished:false,finTime:null,wTimer:Math.random()*80,wVal:0};
+function makeCar(d,i){
+  return{...d,pi:Math.floor((i/DEFS.length)*PL*.18),lap:0,speed:d.baseSpd*.9,finished:false,finTime:null,wTimer:Math.random()*80,wVal:0};
 }
 
-// ── Reset / Start ──────────────────────────────────────────────────────────
 function resetRace(){
-  clearInterval(ticker); cancelAnimationFrame(raf);
-  ticker=null; raf=null; racing=false; done=false; raceTime=0; tick=0;
+  clearInterval(ticker);cancelAnimationFrame(raf);
+  ticker=null;raf=null;racing=false;done=false;raceTime=0;tick=0;
   cars=DEFS.map(makeCar);
   document.getElementById('overlay').classList.remove('show');
-  const btn=document.getElementById('startBtn');
-  btn.textContent='▶ START'; btn.disabled=false;
+  const b=document.getElementById('startBtn');b.textContent='▶ START';b.disabled=false;
   setStatus('dot','STANDBY');
   document.getElementById('log').innerHTML='';
-  drawAll(); updateUI();
+  drawAll();updateUI();
 }
 
 function startRace(){
-  if(racing)return; racing=true;
+  if(racing)return;racing=true;
   document.getElementById('startBtn').textContent='● RACING';
   document.getElementById('startBtn').disabled=true;
   setStatus('dot live','LIVE');
   addLog('LIGHTS OUT — GO!',true);
   ticker=setInterval(physicsTick,1000/60);
-  (function renderLoop(){drawAll();updateUI();if(!done)raf=requestAnimationFrame(renderLoop);})();
+  (function loop(){drawAll();updateUI();if(!done)raf=requestAnimationFrame(loop);})();
 }
 
 function setStatus(cls,txt){
@@ -349,7 +348,7 @@ function setStatus(cls,txt){
 // ── Physics ───────────────────────────────────────────────────────────────
 function physicsTick(){
   if(done){clearInterval(ticker);return;}
-  raceTime+=1/60; tick++;
+  raceTime+=1/60;tick++;
   const ranked=[...cars].sort((a,b)=>(b.lap*PL+b.pi)-(a.lap*PL+a.pi));
   cars.forEach(car=>{
     if(car.finished)return;
@@ -362,7 +361,7 @@ function physicsTick(){
     car.speed=Math.max(.25,Math.min(1.6,car.speed));
     car.pi+=car.speed*1.35;
     if(car.pi>=PL){
-      car.pi-=PL; car.lap++;
+      car.pi-=PL;car.lap++;
       addLog(`LAP ${car.lap} — ${car.name}`,car.lap===LAPS);
       if(car.lap>=LAPS){car.finished=true;car.finTime=raceTime;if(!done)endRace(car);}
     }
@@ -370,7 +369,7 @@ function physicsTick(){
 }
 
 function endRace(w){
-  done=true; clearInterval(ticker);
+  done=true;clearInterval(ticker);
   setStatus('dot','FINISHED');
   const m=Math.floor(w.finTime/60),s=(w.finTime%60).toFixed(2).padStart(5,'0');
   document.getElementById('ovTitle').textContent=`${w.name} WINS!`;
@@ -380,8 +379,8 @@ function endRace(w){
 
 // ── Draw ──────────────────────────────────────────────────────────────────
 function drawAll(){
-  ctx.fillStyle='#071509'; ctx.fillRect(0,0,CW,CH);
-  ctx.strokeStyle='rgba(255,255,255,0.018)'; ctx.lineWidth=1;
+  ctx.fillStyle='#071509';ctx.fillRect(0,0,CW,CH);
+  ctx.strokeStyle='rgba(255,255,255,0.018)';ctx.lineWidth=1;
   for(let x=0;x<CW;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,CH);ctx.stroke();}
   for(let y=0;y<CH;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(CW,y);ctx.stroke();}
   drawTrack();
@@ -391,24 +390,23 @@ function drawAll(){
 function mkPath(){ctx.beginPath();PATH.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();}
 
 function drawTrack(){
-  ctx.lineJoin='round'; ctx.lineCap='round';
-  ctx.lineWidth=TW+12; ctx.strokeStyle='rgba(0,0,0,0.5)'; mkPath(); ctx.stroke();
-  ctx.lineWidth=TW;    ctx.strokeStyle='#141e2a';          mkPath(); ctx.stroke();
-  ctx.lineWidth=TW-10; ctx.strokeStyle='#18263a';          mkPath(); ctx.stroke();
-
+  ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.lineWidth=TW+12;ctx.strokeStyle='rgba(0,0,0,0.5)';mkPath();ctx.stroke();
+  ctx.lineWidth=TW;ctx.strokeStyle='#141e2a';mkPath();ctx.stroke();
+  ctx.lineWidth=TW-10;ctx.strokeStyle='#18263a';mkPath();ctx.stroke();
   for(let i=0;i<PL;i+=10){
     if(Math.floor(i/10)%2===0){
       const p=PATH[i],pn=PATH[(i+1)%PL];
       const ang=Math.atan2(pn.y-p.y,pn.x-p.x)+Math.PI/2,hw=TW/2+1;
-      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(ang);
-      ctx.fillStyle='rgba(255,30,60,0.22)'; ctx.fillRect(-2,-hw,4,5);
-      ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fillRect(-2,hw-5,4,5);
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(ang);
+      ctx.fillStyle='rgba(255,30,60,0.22)';ctx.fillRect(-2,-hw,4,5);
+      ctx.fillStyle='rgba(255,255,255,0.1)';ctx.fillRect(-2,hw-5,4,5);
       ctx.restore();
     }
   }
-  ctx.setLineDash([6,10]); ctx.lineWidth=1; ctx.strokeStyle='rgba(240,192,64,0.15)'; mkPath(); ctx.stroke(); ctx.setLineDash([]);
+  ctx.setLineDash([6,10]);ctx.lineWidth=1;ctx.strokeStyle='rgba(240,192,64,0.15)';mkPath();ctx.stroke();ctx.setLineDash([]);
   const sf=PATH[0],sf1=PATH[1],ang=Math.atan2(sf1.y-sf.y,sf1.x-sf.x)+Math.PI/2;
-  ctx.save(); ctx.translate(sf.x,sf.y); ctx.rotate(ang);
+  ctx.save();ctx.translate(sf.x,sf.y);ctx.rotate(ang);
   for(let k=0;k<6;k++){ctx.fillStyle=k%2?'#eee':'#222';ctx.fillRect(-TW/2+k*6,-3,6,6);}
   ctx.restore();
 }
@@ -416,54 +414,54 @@ function drawTrack(){
 function drawCar(car){
   const pi=Math.floor(car.pi)%PL,p=PATH[pi],pn=PATH[(pi+1)%PL];
   const ang=Math.atan2(pn.y-p.y,pn.x-p.x);
-  ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(ang);
-  ctx.fillStyle='rgba(0,0,0,0.38)'; ctx.fillRect(-6,-1,13,7);
-  ctx.fillStyle=car.color; ctx.fillRect(-6,-3,12,7);
-  ctx.fillStyle=car.accent; ctx.fillRect(-1,-3,5,4);
-  ctx.fillStyle=car.color; ctx.fillRect(6,-1,3,3);
+  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(ang);
+  ctx.fillStyle='rgba(0,0,0,0.38)';ctx.fillRect(-6,-1,13,7);
+  ctx.fillStyle=car.color;ctx.fillRect(-6,-3,12,7);
+  ctx.fillStyle=car.accent;ctx.fillRect(-1,-3,5,4);
+  ctx.fillStyle=car.color;ctx.fillRect(6,-1,3,3);
   ctx.fillStyle='#0a0a0a';
-  ctx.fillRect(-7,-4,3,3); ctx.fillRect(4,-4,3,3);
-  ctx.fillRect(-7,3,3,3);  ctx.fillRect(4,3,3,3);
+  ctx.fillRect(-7,-4,3,3);ctx.fillRect(4,-4,3,3);
+  ctx.fillRect(-7,3,3,3);ctx.fillRect(4,3,3,3);
   if(car.speed>.88&&tick%4<2){ctx.fillStyle=car.color+'55';ctx.fillRect(-10,-1,4,2);}
   ctx.restore();
 }
 
 // ── UI ────────────────────────────────────────────────────────────────────
-function ranked(){
+function getRanked(){
   return [...cars].sort((a,b)=>{
     if(a.finished!==b.finished)return a.finished?-1:1;
     return(b.lap*PL+b.pi)-(a.lap*PL+a.pi);
   });
 }
 
+function pip(id,color,accent){
+  const p=document.getElementById(id);if(!p)return;
+  const d=p.getContext('2d');d.fillStyle=color;d.fillRect(0,0,8,8);d.fillStyle=accent;d.fillRect(1,1,5,4);
+}
+
 function updateUI(){
-  const r=ranked(), leader=r[0];
+  const r=getRanked(),leader=r[0];
   const m=Math.floor(raceTime/60),s=Math.floor(raceTime%60).toString().padStart(2,'0');
   const lapTxt=`${Math.min((leader?.lap||0)+1,LAPS)}/${LAPS}`;
   let gapTxt='—';
-  if(r.length>=2){
-    const g=((leader.lap*PL+leader.pi)-(r[1].lap*PL+r[1].pi))/PL;
-    gapTxt=`${(g*3.8).toFixed(1)}s`;
-  }
+  if(r.length>=2){const g=((leader.lap*PL+leader.pi)-(r[1].lap*PL+r[1].pi))/PL;gapTxt=`${(g*3.8).toFixed(1)}s`;}
 
-  // Desktop standings
+  // Desktop
   document.getElementById('standings').innerHTML=r.map((c,i)=>{
-    const lT=leader.lap*PL+leader.pi,mT=c.lap*PL+c.pi,gap=(lT-mT)/PL;
+    const gap=((leader.lap*PL+leader.pi)-(c.lap*PL+c.pi))/PL;
     return `<div class="stand-row">
       <span class="stand-pos">${i+1}</span>
-      <canvas width="8" height="8" style="image-rendering:pixelated;display:block" id="pip${i}"></canvas>
+      <canvas width="8" height="8" style="image-rendering:pixelated;display:block" id="dp${i}"></canvas>
       <span class="stand-name">${c.name}</span>
       <span class="stand-gap">${i===0?'LEAD':'+'+((gap*3.8).toFixed(1))+'s'}</span>
     </div>`;
   }).join('');
-  r.forEach((c,i)=>{const p=document.getElementById(`pip${i}`);if(!p)return;const d=p.getContext('2d');d.fillStyle=c.color;d.fillRect(0,0,8,8);d.fillStyle=c.accent;d.fillRect(1,1,5,4);});
+  r.forEach((c,i)=>pip(`dp${i}`,c.color,c.accent));
 
-  // Desktop stats
-  document.getElementById('sLap').textContent=lapTxt;
-  document.getElementById('sTime').textContent=`${m}:${s}`;
-  document.getElementById('sGap').textContent=gapTxt;
+  ['sLap','sTime','sGap'].forEach((id,j)=>{
+    document.getElementById(id).textContent=[lapTxt,`${m}:${s}`,gapTxt][j];
+  });
 
-  // Desktop speed bars
   document.getElementById('speedBars').innerHTML=r.map(c=>{
     const pct=Math.min(100,(c.speed/1.6)*100);
     return `<div class="sbar-row">
@@ -474,19 +472,21 @@ function updateUI(){
   }).join('');
 
   // Mobile stats
-  document.getElementById('mLap').textContent=lapTxt;
-  document.getElementById('mTime').textContent=`${m}:${s}`;
-  document.getElementById('mGap').textContent=gapTxt;
+  ['mLap','mTime','mGap'].forEach((id,j)=>{
+    document.getElementById(id).textContent=[lapTxt,`${m}:${s}`,gapTxt][j];
+  });
 
-  // Mobile standings strip
-  document.getElementById('mobStandings').innerHTML=r.map((c,i)=>`
+  // Mobile standings grid
+  document.getElementById('mobStand').innerHTML=r.map((c,i)=>`
     <div class="mob-car">
-      <canvas width="8" height="8" style="image-rendering:pixelated;display:block" id="mpip${i}"></canvas>
-      <span class="mob-car-pos">${i+1}.</span>
-      <span class="mob-car-name">${c.name}</span>
-      <span style="font-size:7px;color:var(--dim);margin-left:2px">L${c.lap}</span>
+      <div style="display:flex;align-items:center;gap:3px">
+        <canvas width="8" height="8" style="image-rendering:pixelated;display:block;flex-shrink:0" id="mp${i}"></canvas>
+        <span class="mob-pos">${i+1}</span>
+      </div>
+      <span class="mob-name">${c.name}</span>
+      <span class="mob-lap">L${c.lap}</span>
     </div>`).join('');
-  r.forEach((c,i)=>{const p=document.getElementById(`mpip${i}`);if(!p)return;const d=p.getContext('2d');d.fillStyle=c.color;d.fillRect(0,0,8,8);d.fillStyle=c.accent;d.fillRect(1,1,5,4);});
+  r.forEach((c,i)=>pip(`mp${i}`,c.color,c.accent));
 }
 
 function addLog(msg,hi=false){
